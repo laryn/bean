@@ -900,12 +900,6 @@ function bean_block_view($delta = '') {
     );
   }
 
-  if (!empty($return['content']) && module_exists('contextual')) {
-    $return['content']['#contextual_links']['bean'] = array(
-      'block', array($bean->Identifier(), 'edit')
-    );
-  }
-
   return $return;
 }
 
