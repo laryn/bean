@@ -9,6 +9,10 @@
  * Implements hook_views_data_alter().
  */
 function bean_views_data_alter(&$data) {
+  $data['bean']['table']['group'] = 'Block';
+
+  $data['bean']['table']['entity type'] = 'bean';
+
   $data['bean']['type'] = array(
     'title' => t('Type'),
     'help' => t('The block type'),
