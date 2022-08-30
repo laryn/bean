@@ -56,7 +56,10 @@ function bean_admin_ui_admin_page() {
   }
   ksort($rows);
 
-  $header = array(t('Name'), t('Status'), array('data' => t('Operations'), 'colspan' => $field_ui ? '4' : '2'));
+  $header = array(t('Name'), t('Status'), array(
+      'data' => t('Operations'),
+      'colspan' => $field_ui ? '4' : '2',
+    ));
 
   $build['bean_table'] = array(
     '#theme' => 'table',
@@ -92,7 +95,7 @@ function bean_admin_ui_type_form($form, &$form_state, $bean_type = NULL) {
   $disabled = !$bean_type->isEditable();
 
   if ($disabled) {
-    drupal_set_message(t('This Block Type can not be edited'));
+    backdrop_set_message(t('This Block Type can not be edited'));
   }
   $form['bean_type'] = array(
     '#type' => 'value',
@@ -181,16 +184,25 @@ function bean_admin_ui_type_form_submit(&$form, &$form_state) {
 
   // Clear the site caches so that the new "manage fields" and "display fields"
   // pages for the new bean type work.
-  drupal_flush_all_caches();
+  backdrop_flush_all_caches();
 }
 
 /**
  * Menu callback; Form builder to confirm delete/revert of a bean type.
  */
 function bean_admin_ui_type_op_confirm($form, &$form_state, $op, $type) {
-  $form['op'] = array('#type' => 'value', '#value' => $op);
-  $form['type'] = array('#type' => 'value', '#value' => $type);
-  $form['name'] = array('#type' => 'value', '#value' => $type->getLabel());
+  $form['op'] = array(
+    '#type' => 'value',
+    '#value' => $op,
+  );
+  $form['type'] = array(
+    '#type' => 'value',
+    '#value' => $type,
+  );
+  $form['name'] = array(
+    '#type' => 'value',
+    '#value' => $type->getLabel(),
+  );
   $caption = '';
   if ($op == 'delete') {
     $message = t('Are you sure you want to delete the block type %type?', array('%type' => $type->getLabel()));
@@ -209,6 +221,10 @@ function bean_admin_ui_type_op_confirm($form, &$form_state, $op, $type) {
   return confirm_form($form, $message, 'admin/structure/block-types', $caption, $action);
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function bean_admin_ui_type_op_confirm_submit($form, &$form_state) {
   $form_state['values']['type']->{$form['op']['#value']}();
   $form_state['redirect'] = 'admin/structure/block-types';

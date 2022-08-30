@@ -43,7 +43,7 @@ class views_handler_field_bean_operations extends views_handler_field_entity {
         // Add the destination to the links if specified.
         if ($this->options['add_destination']) {
           foreach ($links as $id => &$link) {
-            $link['query'] = drupal_get_destination();
+            $link['query'] = backdrop_get_destination();
           }
         }
 

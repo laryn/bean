@@ -29,7 +29,7 @@ function bean_admin_ui_menu() {
 
   $items['admin/structure/block-types/add'] = array(
     'title' => 'Add block type',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('bean_admin_ui_type_form'),
     'access arguments' => array('administer bean types'),
     'type' => MENU_LOCAL_ACTION,
@@ -40,7 +40,7 @@ function bean_admin_ui_menu() {
     'title' => 'Edit block type',
     'title arguments' => array(4),
     'title callback' => 'bean_admin_ui_page_title',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('bean_admin_ui_type_form', 4),
     'access arguments' => array('administer bean types'),
     'file' => 'bean_admin_ui.admin.inc',
@@ -139,7 +139,7 @@ function _bean_admin_default_plugin() {
       'class' => 'BeanCustom',
       'parent' => 'bean',
       'file' => 'BeanCustom.class.php',
-      'path' => drupal_get_path('module', 'bean_admin_ui') . '/plugins',
+      'path' => backdrop_get_path('module', 'bean_admin_ui') . '/plugins',
     ),
   );
 }
@@ -153,7 +153,7 @@ function bean_admin_ui_features_api() {
     module_load_include('inc', 'features', 'includes/features.ctools');
     $api = ctools_component_features_api('bean_admin_ui');
     $api['bean_type']['name'] = 'Bean types';
-    $api['bean_type']['file'] = drupal_get_path('module', 'bean_admin_ui') . '/includes/features.inc';
+    $api['bean_type']['file'] = backdrop_get_path('module', 'bean_admin_ui') . '/includes/features.inc';
   }
   return $api;
 }
@@ -164,7 +164,7 @@ function bean_admin_ui_features_api() {
 function bean_admin_ui_modules_enabled($modules) {
   $beans_found = FALSE;
   foreach ($modules as $module) {
-    if (function_exists($module .'_bean_types')) {
+    if (function_exists($module . '_bean_types')) {
       $beans_found = TRUE;
     }
   }
@@ -172,4 +172,13 @@ function bean_admin_ui_modules_enabled($modules) {
   if ($beans_found) {
     bean_reset();
   }
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function bean_admin_ui_autoload_info() {
+  return array(
+    'BeanCustom' => 'plugins/BeanCustom.class.php',
+  );
 }

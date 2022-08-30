@@ -91,6 +91,16 @@ class BeanTestPlugin extends BeanPlugin {
 
     return $form;
   }
+
+  /**
+   * Implements hook_autoload_info().
+   */
+  function bean_test_autoload_info() {
+    return array(
+      'BeanTestPlugin' => 'bean_test.module',
+      'BeanPluginWrong' => 'bean_test.module',
+    );
+  }
 }
 
-class BeanPluginWrong {}
+class BeanPluginWrong { }

@@ -219,7 +219,7 @@ class Bean extends Entity {
    * Load and set the plugin info.
    * This can be called externally via loadUP()
    */
-  protected  function setPlugin($plugin) {
+  protected function setPlugin($plugin) {
     $this->plugin = $plugin;
 
     return $this;
@@ -249,10 +249,10 @@ class Bean extends Entity {
   }
 
   /**
-  * Get the default label
-  *
-  * @return string
-  */
+   * Get the default label
+   *
+   * @return string
+   */
   protected function defaultLabel() {
     if (empty($this->title)) {
       return $this->label;
@@ -392,16 +392,16 @@ class Bean extends Entity {
   /**
    * Set the delta function
    */
-  protected  function checkDelta() {
+  protected function checkDelta() {
     if (empty($this->delta)) {
       $max_length = 32;
 
       // Base it on the label and make sure it isn't too long for the database.
       if (module_exists('transliteration')) {
-        $delta = drupal_clean_css_identifier(strtolower(transliteration_get($this->label)));
+        $delta = backdrop_clean_css_identifier(strtolower(transliteration_get($this->label)));
       }
       else {
-        $delta = drupal_clean_css_identifier(strtolower($this->label));;
+        $delta = backdrop_clean_css_identifier(strtolower($this->label));
       }
 
       // Add 'bean-' prefix when it's need to avoid a purely numeric delta.
@@ -418,7 +418,7 @@ class Bean extends Entity {
         $original_delta = $this->delta;
         do {
           $unique_suffix = $separator . $i++;
-          $this->delta = substr($original_delta, 0, $max_length - drupal_strlen($unique_suffix)) . $unique_suffix;
+          $this->delta = substr($original_delta, 0, $max_length - backdrop_strlen($unique_suffix)) . $unique_suffix;
         } while ($this->deltaExists($this->delta));
       }
     }
@@ -533,4 +533,4 @@ class BeanEntityAPIController extends EntityAPIControllerExportable {
   }
 }
 
-class BeanException extends Exception {};
+class BeanException extends Exception { }
