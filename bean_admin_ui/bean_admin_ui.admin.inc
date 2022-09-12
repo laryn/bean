@@ -65,7 +65,7 @@ function bean_admin_ui_admin_page() {
     '#theme' => 'table',
     '#header' => $header,
     '#rows' => $rows,
-    '#empty' => t('There are no Block Types Available'),
+    '#empty' => t('There are no Block types available.'),
   );
   return $build;
 }
@@ -174,13 +174,22 @@ function bean_admin_ui_type_form_submit(&$form, &$form_state) {
   if (in_array($op, array('revert', 'delete'))) {
     $form_state['redirect'] = 'admin/structure/block-types/manage/' . $form['bean_type']['#value']->type . '/' . $op;
   }
+  $config = config('bean.type.' . $form_state['values']['name']);
+  $config->set('name', $form_state['values']['name']);
+  $config->set('label', $form_state['values']['label']);
+  $config->set('description', $form_state['values']['description']);
+  $config->save();
+
+  /*
   $bean_type = $form_state['values']['bean_type'];
   $bean_type->type = $form_state['values']['name'];
   $bean_type->setLabel($form_state['values']['label']);
   $bean_type->setDescription($form_state['values']['description']);
+  dpm($bean_type);
+  dpm($form_state['values']);
   $bean_type->save($form_state['values']['new']);
   $form_state['redirect'] = 'admin/structure/block-types';
-  ctools_include('export');
+*/
 
   // Clear the site caches so that the new "manage fields" and "display fields"
   // pages for the new bean type work.

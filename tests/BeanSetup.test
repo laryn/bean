@@ -32,8 +32,7 @@ abstract class BeanSetup extends DrupalWebTestCase {
     $modules[] = 'block';
 
     // Contrib dependencies.
-    $modules[] = 'ctools';
-    $modules[] = 'entity';
+    $modules[] = 'entity_plus';
 
     // The Bean module itself.
     $modules[] = 'bean';

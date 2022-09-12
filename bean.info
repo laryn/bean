@@ -5,7 +5,4 @@ type = module
 package = Bean
 
 ; These modules are required.
-dependencies[] = ctools
-dependencies[] = entity
-
-; Tests.
+dependencies[] = entity_plus

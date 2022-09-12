@@ -142,6 +142,10 @@ interface BeanTypePluginInterface {
  * The Bean entity class
  */
 class Bean extends Entity {
+  protected $entityInfo; // stores the info provided in hook_entity_info() for this entity.
+  protected $idKey; // Stores the key where the id is stored.
+  protected $nameKey; // Stores the key where the name of the entity is stored.
+
   public $label;
   public $description;
   public $title;
@@ -182,6 +186,42 @@ class Bean extends Entity {
     }
 
     parent::__construct($values, 'bean');
+    $this->entityType = $entityType;
+    $this->entityInfo = entity_get_info($this->entityType);
+    $this->idKey = $this->entityInfo['entity keys']['id'];
+    $this->nameKey = $this->entityInfo['entity keys']['name'];
+
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Returns the id of this entity.
+   */
+  public function id() {
+    return $this->{$this->idKey};
+  }
+
+
+  /**
+   * {@inheritdoc}
+   *
+   * Since this is a configuration entity, there is no need to provide a uri.
+   * Configuration entities don't have a 'page' for viewing them.
+   */
+  function uri() { }
+
+  function entityType() {
+    return 'bean';
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Return the human label for this entity.
+   */
+  function label() {
+    return $this->{$this->entityInfo['entity keys']['label']};
   }
 
   public function adminTitle() {
@@ -449,7 +489,7 @@ class Bean extends Entity {
   }
 }
 
-class BeanEntityAPIController extends EntityAPIControllerExportable {
+class BeanEntityController extends EntityPlusControllerExportable {
   protected function setPlugin(Bean $bean) {
     static $plugins = array();
 

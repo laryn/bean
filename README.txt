@@ -8,7 +8,7 @@ Bean Types
 ----------
 
 A Bean Type (or Block Type) is a bundle of beans (blocks).
-Each Bean type is defined by a ctools plugin and are fieldable.
+Each Bean type is defined by plugin and are fieldable.
 Currently Bean Types are only defined in hook_bean_plugins().
 
 If you enable bean_admin_ui you can add/edit bean types at

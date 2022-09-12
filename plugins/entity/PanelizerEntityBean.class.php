@@ -131,7 +131,7 @@ class PanelizerEntityBean extends PanelizerEntityDefault {
    * Implements hook_views_plugins_alter().
    */
   function hook_views_plugins_alter(&$plugins) {
-    $path = drupal_get_path('module', 'panelizer') . '/plugins/views';
+    $path = backdrop_get_path('module', 'panelizer') . '/plugins/views';
     $plugins['row']['panelizer_bean_view'] = array(
       'title' => t('Panelizer display'),
       'help' => t('Render entities using the panels display for any that have been panelized.'),

@@ -13,7 +13,7 @@ function bean_entity_info() {
     'bean' => array(
       'label' => t('Block'),
       'entity class' => 'Bean',
-      'controller class' => 'BeanEntityAPIController',
+      'controller class' => 'BeanEntityController',
       // This class provides integration with the Inline entity form module.
       'inline entity form' => array(
         'controller' => 'BeanInlineEntityFormController',
@@ -113,6 +113,7 @@ function bean_menu() {
   );
 
   foreach (bean_get_types() as $type) {
+    dpm($type);
     if (!empty($type)) {
       $items['block/add/' . $type->buildURL()] = array(
         'title' => $type->getLabel(),
@@ -344,17 +345,16 @@ function bean_get_types() {
  */
 function bean_fetch_plugin_info($plugin = NULL) {
   $plugins = &backdrop_static(__FUNCTION__);
-  ctools_include('plugins');
 
   if (empty($plugins)) {
     if (($cache = cache_get('bean_plugins')) && !empty($cache->data)) {
       $plugins = $cache->data;
     }
     else {
-      $plugins = ctools_get_plugins('bean', 'types');
+      $plugins = bean_get_plugins('types');
 
       // Only use modules with the same version.
-      $allowed_modules = array_keys(ctools_plugin_api_info('bean', 'types', bean_min_version(), bean_current_version()));
+      //$allowed_modules = array_keys(ctools_plugin_api_info('bean', 'types', bean_min_version(), bean_current_version()));
       foreach ($plugins as $key => $plugin_value) {
         if (!in_array($plugin_value['module'], $allowed_modules) || ($plugin_value['abstract'])) {
           unset($plugins[$key]);
@@ -370,9 +370,9 @@ function bean_fetch_plugin_info($plugin = NULL) {
   else {
     // Make sure the plugin is in the cache.
     if (!isset($plugins[$plugin])) {
-      $plugin_info = ctools_get_plugins('bean', 'types', $plugin);
+      $plugin_info = bean_get_plugins('types', $plugin);
       if (empty($allowed_modules)) {
-        $allowed_modules = array_keys(ctools_plugin_api_info('bean', 'types', bean_current_version(), bean_min_version()));
+        //$allowed_modules = array_keys(ctools_plugin_api_info('bean', 'types', bean_current_version(), bean_min_version()));
       }
       if (in_array($plugin_info['module'], $allowed_modules)) {
         $plugins[$plugin] = $plugin_info;
@@ -390,22 +390,65 @@ function bean_fetch_plugin_info($plugin = NULL) {
 }
 
 /**
+ * Convert CTools plugins to info hook.
+ */
+function bean_get_plugins($type) {
+  // @todo
+
+}
+
+
+/**
+ * Function to create or update a Bean type.
+ *
+ * @param object $type
+ *   The object of the Bean type to create/update.
+ *
+ * @return int
+ *   SAVED_UPDATED when updated, SAVED_NEW when created.
+ *
+ * @throws Exception
+ */
+function bean_type_save($type) {
+  dpm($type);
+  $config = config('bean.type.' . $type->name);
+
+  if ($config->isNew()) {
+    $status = SAVED_NEW;
+  }
+  else {
+    $status = SAVED_UPDATED;
+  }
+
+  $type_data = array(
+    //'type_id', 'name', 'label', 'options', 'description'
+    'type_id' => (string) $type->type_id,
+    'name' => (string) $type->name,
+    'label' => (string) $type->label,
+    'description' => (string) $type->description,
+    'options' => $type->options,
+  );
+  foreach ($bundle_data as $key => $value) {
+    $config->set($key, $value);
+  }
+  $config->save();
+  paragraphs_bundle_load(NULL, TRUE);
+  entity_info_cache_clear();
+  state_set('menu_rebuild_needed', TRUE);
+  return $status;
+}
+
+/**
  * Reset the static variables and caches.
  */
 function bean_reset($skip_menu_rebuild = FALSE, $rehash_blocks = FALSE) {
-  // Clear ctools cache.
-  ctools_include('plugins');
-  ctools_get_plugins_reset();
   cache_clear_all('plugins:bean:types', 'cache');
-  cache_clear_all('ctools_plugin_files', 'cache', TRUE);
 
   // Invoke modules to clear their caches.
   foreach (module_implements('bean_cache_clear') as $module) {
     module_invoke($module, 'bean_cache_clear');
   }
 
-  // Rebuild ctools plugin types and the menu.
-  ctools_plugin_get_plugin_type_info(TRUE);
   if (!$skip_menu_rebuild) {
     menu_rebuild();
   }
@@ -435,7 +478,7 @@ function bean_bean_cache_clear() {
   cache_clear_all('bean_block_info', 'cache');
 
   if (module_exists('block')) {
-    cache_clear_all(NULL, 'cache_block');
+    //cache_clear_all(NULL, 'cache_block');
   }
   cache_clear_all(NULL, 'cache_page');
 }
@@ -446,10 +489,10 @@ function bean_bean_cache_clear() {
  */
 function bean_cache_clear_block($bean = null) {
   if (isset($bean->delta)) {
-    cache_clear_all('bean:' . $bean->delta . ':', 'cache_block', TRUE);
+    //cache_clear_all('bean:' . $bean->delta . ':', 'cache_block', TRUE);
   }
   else {
-    cache_clear_all('bean:', 'cache_block', TRUE);
+    //cache_clear_all('bean:', 'cache_block', TRUE);
   }
 
   cache_clear_all('bean_block_info', 'cache');
@@ -467,8 +510,9 @@ function bean_load_plugin_class($plugin_key = NULL) {
   $cache = &backdrop_static(__FUNCTION__);
 
   if (!isset($cache[$plugin_key])) {
-    ctools_include('plugins');
-    $class = ctools_plugin_load_class('bean', 'types', $plugin_key, 'handler');
+    // @todo
+    //ctools_include('plugins');
+    //$class = ctools_plugin_load_class('bean', 'types', $plugin_key, 'handler');
     if ($class && bean_check_plugin_class($class)) {
       $cache[$plugin_key] = new $class(bean_fetch_plugin_info($plugin_key));
     }
@@ -1185,11 +1229,11 @@ function bean_ctools_block_info($module, $delta, &$info) {
   // If the bean type loaded correctly (should always happen),
   if (isset($bean_types[$bean->type])) {
     // Optionally group the blocks by their bean type..
-    if ($config->get('bean_ctools_separate')) {
+    if ($config->get('bean_separate')) {
       $info['category'] = t('Blocks') . ': ' . $bean_types[$bean->type]->getLabel();
     }
     // Optionally prefix the block with the bean type's label.
-    if ($config->get('bean_ctools_prefix')) {
+    if ($config->get('bean_prefix')) {
       $info['title'] = $bean_types[$bean->type]->getLabel() . ': ' . $info['title'];
     }
   }
@@ -1213,7 +1257,7 @@ function bean_autoload_info() {
   return array(
     'BeanTypePluginInterface' => 'includes/bean.core.inc',
     'Bean' => 'includes/bean.core.inc',
-    'BeanEntityAPIController' => 'includes/bean.core.inc',
+    'BeanEntityController' => 'includes/bean.core.inc',
     'BeanException' => 'includes/bean.core.inc',
     'BeanMetadataController' => 'includes/bean.info.inc',
     'BeanInlineEntityFormController' => 'includes/bean.inline_entity_form.inc',

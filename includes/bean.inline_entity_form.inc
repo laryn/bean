@@ -106,7 +106,7 @@ class BeanInlineEntityFormController extends EntityInlineEntityFormController {
       $entity_form['revision']['#access'] = FALSE;
     }
 
-    ctools_include('dependent');
+    //ctools_include('dependent');
     ctools_add_js('dependent');
 
     $entity_form['revision']['is_new_revision'] = array(

@@ -17,7 +17,7 @@ class BeanCustom extends BeanPlugin {
     ->condition('type', $this->type)
     ->execute();
 
-    ctools_include('export');
+    //ctools_include('export');
     ctools_export_crud_delete('bean_type', $this->type);
     field_attach_delete_bundle('bean', $this->type);
 
@@ -28,14 +28,10 @@ class BeanCustom extends BeanPlugin {
    * Save the record to the database
    */
   public function save($new = FALSE) {
-    $bean_type = array(
-      'name' => check_plain($this->type),
-      'label' => check_plain($this->getLabel()),
-      'description' => check_plain($this->getDescription()),
-    );
-
-    $primary_key = $new == FALSE ? 'name' : array();
-    drupal_write_record('bean_type', $bean_type, $primary_key);
+    $config = config('bean.type.' . $this->type);
+    $config->set('name', check_plain($this->name));
+    $config->set('label', check_plain($this->getLabel()));
+    $config->set('description', check_plain($this->getDescription()));
 
     bean_reset();
   }
@@ -44,7 +40,7 @@ class BeanCustom extends BeanPlugin {
    * Revert the bean type to code defaults.
    */
   public function revert() {
-    ctools_include('export');
+    //ctools_include('export');
     ctools_export_crud_delete('bean_type', $this->type);
     bean_reset();
   }
@@ -73,4 +69,12 @@ class BeanCustom extends BeanPlugin {
   public function setDescription($description) {
     $this->plugin_info['description'] = $description;
   }
+
+  /**
+   * Build the URL string
+   */
+  public function buildURL() {
+    return str_replace('_', '-', $this->type);
+  }
+
 }

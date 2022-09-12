@@ -212,61 +212,8 @@ function bean_uninstall() {
   foreach (field_info_bundles('bean') as $bean_type => $bean_info) {
     field_attach_delete_bundle('bean', $bean_type);
   }
-
-  //Remove shortcut links
-  if (module_exists('shortcut')) {
-    $shortcut_set = shortcut_default_set();
-    foreach ($shortcut_set->links as $shortcut_key => $shortcut) {
-      if ($shortcut['link_path'] == 'block/add' || $shortcut['link_path'] == 'admin/content/blocks') {
-        unset($shortcut_set->link[$shortcut_key]);
-        shortcut_set_save($shortcut_set);
-        menu_link_delete(NULL, $shortcut['link_path']);
-      }
-    }
-  }
-
-  // Remove all variables used by the module.
-  config_clear('bean.settings', 'bean_ctools_separate');
-  config_clear('bean.settings', 'bean_ctools_prefix');
-  config_clear('bean.settings', 'bean_usage_results_per_page');
-  // Remove all variables for field bundle settings.
-  db_delete('variable')
-    ->condition('name', 'field_bundle_settings_bean%', 'LIKE')
-    ->execute();
-  // Remove all variables for blacklisting modules.
-  // Note: it is not possible to list them here because the variable names are
-  // generated dynamically and are not defined upfront.
-  db_delete('variable')
-    ->condition('name', 'bean_all_blacklist%', 'LIKE')
-    ->execute();
-
 }
 
-/**
- * Implements hook_install().
- */
-function bean_install() {
-
-  if (module_exists('shortcut')) {
-    $t = get_t();
-
-    // Load the default shortcut set
-    $shortcut_set = shortcut_default_set();
-    $shortcut_set->links[] = array(
-      'link_path' => 'block/add',
-      'link_title' => $t('Add block'),
-      'weight' => -18,
-    );
-    $shortcut_set->links[] = array(
-      'link_path' => 'admin/content/blocks',
-      'link_title' => $t('Blocks'),
-      'weight' => -18,
-    );
-
-    shortcut_set_save($shortcut_set);
-  }
-  // Dynamically generated variable data was detected on the following lines.
-}
 /**
  * Implements hook_disable().
  */
@@ -290,40 +237,6 @@ function bean_disable() {
   }
 }
 
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function bean_update_7001() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function bean_update_7002() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function bean_update_7003() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function bean_update_7004() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function bean_update_7005() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function bean_update_7006() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function bean_update_7007(&$return) { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function bean_update_7010(&$sand) { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function bean_update_7011() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function bean_update_7012() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function bean_update_7013() { }
-
 /**
  * Implements hook_update_last_removed().
  */
@@ -337,8 +250,8 @@ function bean_update_last_removed() {
 function bean_update_1000() {
   $config = config('bean.settings');
   $config->set('bean_uid', update_variable_get('bean_uid', '1'));
-  $config->set('bean_ctools_separate', update_variable_get('bean_ctools_separate', TRUE));
-  $config->set('bean_ctools_prefix', update_variable_get('bean_ctools_prefix', array()));
+  $config->set('bean_separate', update_variable_get('bean_ctools_separate', TRUE));
+  $config->set('bean_prefix', update_variable_get('bean_ctools_prefix', array()));
   $config->save();
 
   update_variable_del('bean_uid');

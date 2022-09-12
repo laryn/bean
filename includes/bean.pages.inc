@@ -243,7 +243,7 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
     $form['revision']['#access'] = FALSE;
   }
 
-  ctools_include('dependent');
+  //ctools_include('dependent');
   ctools_add_js('dependent');
 
   $form['revision']['is_new_revision'] = array(
